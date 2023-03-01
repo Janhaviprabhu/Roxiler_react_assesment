@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Heading, HStack, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, HStack, Image, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from '@chakra-ui/react'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,6 +9,7 @@ const Todo = () => {
  const dispatch =useDispatch()
  const [user,setUser]=useState([])
  const [order,setOrder]=useState('asc')
+ const [search,setSearch]=useState('')
 
 
     async function getUser(id){
@@ -20,35 +21,48 @@ const Todo = () => {
     setOrder(order);
   };
 
-   const sortedTodos = task.sort((a, b) =>
+   let sortedTodos = task.sort((a, b) =>
     order === "asc" ? a.id - b.id : b.id - a.id
   );
 
     useEffect(()=>{
-       dispatch(getTodo(order))
-      
-    },[order])
+       dispatch(getTodo())
+    },[])
+
+    if (search) {
+    sortedTodos = sortedTodos.filter((ele) => {
+      return (
+        ele.id.toString().includes(search) ||
+        ele.title.toLowerCase().includes(search.toLowerCase()) ||
+        ele.completed.toString().includes(search)
+      );
+    });
+  }
+  function handleClick(){
+    setSearch('')
+  }
 
     if(isLoading){
-        return <div>....Loading</div>
+        return <Box mt={20} ><Image mt={20} width="20%" margin="auto" src="https://media.tenor.com/0iK9a1WkT40AAAAM/loading-white.gif"/></Box>
     }
     if (isError){
-        return <div>Oops..!! something went wrong</div>
+        return <Box mt={20} ><Image  width="20%" margin="auto" src="https://media.tenor.com/5JunKCV2DEIAAAAC/error404-404.gif"/></Box>
     }
 
   return (
-    <div>
-        <Flex p={10} width={"30%"} margin="auto" gap={5}><Button onClick={() => handleSortClick("asc")}>
+    <div >
+        <Flex p={10} width={"30%"} margin="auto" gap={5}><Button color={'white'} backgroundColor={'black'}  _hover={{bg: 'gray.600'}} onClick={() => handleSortClick("asc")}>
           Sort by ID (Ascending)
         </Button>
-        <Button onClick={() => handleSortClick("desc")}>
+        <Button color={'white'} backgroundColor={'black'}  _hover={{bg: 'gray.600'}} onClick={() => handleSortClick("desc")}>
           Sort by ID (Descending)
         </Button></Flex>
         
-    <Input p={2} width={'20%'} placeholder='Search todo here'/>
-      <Flex>
-        <Box  width={"60%"} margin='auto'>
-        <TableContainer>
+    <Input p={2} variant={'flushed'}  width={'20%'} placeholder='Search todo here' value={search} onChange={(e) => setSearch(e.target.value)}/><Button color={'white'} backgroundColor={'black'}  _hover={{bg: 'gray.600'}}  onClick={handleClick}>Clear</Button>
+      <Flex p={5}>
+        <Box   width={"60%"} margin='auto'>
+            <Heading p={2} color={'black'} fontSize={'md'} noOfLines={1}>Todos</Heading>
+        <TableContainer border='1px solid gray'>
         <Table variant='simple'>
             <Thead>
             <Tr>
@@ -66,7 +80,7 @@ const Todo = () => {
                     <Td>{ele.id}</Td>
                     <Td>{ele.title}</Td>
                     <Td >{ele.completed?"Complete":"Incomplete"}</Td>
-                    <Td><Button onClick={()=>getUser(ele.id)}>View User</Button></Td>
+                    <Td><Button color={'white'} backgroundColor={'black'}  _hover={{bg: 'gray.600'}} onClick={()=>getUser(ele.id)}>View User</Button></Td>
             </Tr>
             </>
                 )
@@ -104,13 +118,13 @@ const Todo = () => {
             </Text>
           <Heading color={'black'} fontSize={'md'} noOfLines={1}>Name : {user.name}</Heading>
         </Box>
-        <HStack display={"inline-block"} borderTop={'1px'} color="black">
+        <HStack  display={"inline-block"} borderTop={'1px'} color="black">
           <Flex
             p={4}
             roundedBottom={'sm'}
             cursor={'pointer'}
             w="full">
-            <Text  fontSize={'md'} fontWeight={'semibold'}>
+            <Text   fontSize={'md'} fontWeight={'semibold'}>
              Email : {user.email}
             </Text>
           </Flex>
