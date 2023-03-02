@@ -7,14 +7,22 @@ import { getTodo } from '../Redux/actions'
 const Todo = () => {
  const {task,isLoading,isError} = useSelector((store) =>store.todo)
  const dispatch =useDispatch()
- const [user,setUser]=useState([])
+ const [user,setUser]=useState({})
  const [order,setOrder]=useState('asc')
  const [search,setSearch]=useState('')
 
 
-    async function getUser(id){
+    async function getUser(id,data){
     const res = await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)
-    setUser(res.data)
+    let userdata={
+      todoid:data.id,
+      todotitle:data.title,
+      userid:res.data.id,
+      username:res.data.name,
+      useremail:res.data.email,
+
+    }
+    setUser(userdata)
     console.log(res.data)   
 }
  const handleSortClick = (order) => {
@@ -27,6 +35,9 @@ const Todo = () => {
 
     useEffect(()=>{
        dispatch(getTodo())
+      //  getUser(user).then((res)=>{
+      //    setUser(user)
+      //  })
     },[])
 
     if (search) {
@@ -80,7 +91,7 @@ const Todo = () => {
                     <Td>{ele.id}</Td>
                     <Td>{ele.title}</Td>
                     <Td >{ele.completed?"Complete":"Incomplete"}</Td>
-                    <Td><Button color={'white'} backgroundColor={'black'}  _hover={{bg: 'gray.600'}} onClick={()=>getUser(ele.id)}>View User</Button></Td>
+                    <Td><Button color={'white'} backgroundColor={'black'}  _hover={{bg: 'gray.600'}} onClick={()=>getUser(ele.userId,ele)}>View User</Button></Td>
             </Tr>
             </>
                 )
@@ -101,22 +112,32 @@ const Todo = () => {
         border={'1px'}
         borderColor="black"
       >
+
+         {/* todoid:data.id,
+      todotitle:data.title,
+      userid:res.data.id,
+      username:res.data.name,
+      useremail:res.data.email, */}
+
         
         <Box p={4}>
           <Box
+          w={"100%"}
             display={'inline-block'}
             px={2}
             py={1}
             mb={2}>
-            <Text fontSize={'md'} fontWeight="medium">
-            Todo ID : {user.id}
+            <Text  px={2} py={1}  mb={2} fontSize={'md'} fontWeight="medium">
+            Todo ID : {user.todoid}
+            </Text>
+             <Text  px={2} py={1}   fontSize={'md'} fontWeight="medium">
+            Todo Title : {user.todotitle}
             </Text>
           </Box>
-           <Text  px={2}
-            py={1}  mb={2} fontSize={'md'} fontWeight="medium">
-            User  ID : {user.id}
+           <Text  px={2} py={1}  mb={2} fontSize={'md'} fontWeight="medium">
+            User  ID : {user.userid}
             </Text>
-          <Heading color={'black'} fontSize={'md'} noOfLines={1}>Name : {user.name}</Heading>
+          <Heading color={'black'} fontSize={'md'} noOfLines={1}>Name : {user.username}</Heading>
         </Box>
         <HStack  display={"inline-block"} borderTop={'1px'} color="black">
           <Flex
@@ -125,7 +146,7 @@ const Todo = () => {
             cursor={'pointer'}
             w="full">
             <Text   fontSize={'md'} fontWeight={'semibold'}>
-             Email : {user.email}
+             Email : {user.useremail}
             </Text>
           </Flex>
           
